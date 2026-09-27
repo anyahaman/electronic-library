@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Новая рецензия{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
+{% endblock %}
+{% block content %}
+<div class="form-card" style="max-width:820px;margin:0 auto">
+    <a href="{{ url_for('book_page', id=book.id) }}">← Вернуться к книге</a>
+    <h1>Рецензия на «{{ book.title }}»</h1>
+
+    <form id="review-form" method="POST">
+        <div class="field">
+            <label>Оценка</label>
+            <select name="rating">
+                <option value="5" selected>отлично</option>
+                <option value="4">хорошо</option>
+                <option value="3">удовлетворительно</option>
+                <option value="2">неудовлетворительно</option>
+                <option value="1">плохо</option>
+                <option value="0">ужасно</option>
+            </select>
+        </div>
+
+        <div class="field">
+            <label>Текст рецензии</label>
+            <textarea id="review-text" name="text" rows="8"></textarea>
+            <span class="help">Можно использовать Markdown.</span>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit">Сохранить</button>
+            <a class="btn btn-secondary" href="{{ url_for('book_page', id=book.id) }}">Отмена</a>
+        </div>
+    </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
+<script>
+    const reviewElement = document.getElementById('review-text');
+    if (reviewElement) {
+        const reviewEditor = new EasyMDE({ element: reviewElement, spellChecker: false });
+        const reviewForm = document.getElementById('review-form');
+        if (reviewForm) {
+            reviewForm.addEventListener('submit', function () {
+                reviewEditor.codemirror.save();
+            });
+        }
+    }
+</script>
+{% endblock %}

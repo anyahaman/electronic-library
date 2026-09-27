@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Мои подборки{% endblock %}
+{% block content %}
+<div class="toolbar">
+    <div>
+        <h1 style="margin:0">Мои подборки</h1>
+        <div class="meta">Сохраняйте книги по темам, настроению или планам на чтение.</div>
+    </div>
+    <button type="button" onclick="document.getElementById('newCollectionModal').style.display='flex'">＋ Добавить подборку</button>
+</div>
+
+<div class="table-card table-wrap">
+<table>
+    <thead><tr><th>Название</th><th>Количество книг</th><th>Действие</th></tr></thead>
+    <tbody>
+    {% for collection in collections %}
+    <tr>
+        <td><b>{{ collection.name }}</b></td>
+        <td>{{ collection.books|length }}</td>
+        <td><a class="btn btn-secondary" href="{{ url_for('collection_view', id=collection.id) }}">Просмотр</a></td>
+    </tr>
+    {% else %}
+    <tr><td colspan="3"><div class="empty-state">Подборок пока нет.</div></td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+</div>
+
+<div id="newCollectionModal" class="modal" style="display:none">
+    <div class="modal-box">
+        <h3>Новая подборка</h3>
+        <form method="POST" action="{{ url_for('create_collection') }}">
+            <div class="field">
+                <label>Название подборки</label>
+                <input type="text" name="name" placeholder="Например: На каникулы" required>
+            </div>
+            <div class="form-actions">
+                <button type="submit">Добавить</button>
+                <button class="btn btn-secondary" type="button" onclick="document.getElementById('newCollectionModal').style.display='none'">Отмена</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

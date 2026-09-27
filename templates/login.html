@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Вход{% endblock %}
+{% block content %}
+<div class="form-card" style="max-width:520px;margin:20px auto">
+    <h1 style="margin-top:0">Вход</h1>
+    <p class="meta">Войдите, чтобы работать с рецензиями и доступными вашей роли функциями.</p>
+    <form method="POST">
+        <div class="field">
+            <label>Логин</label>
+            <input type="text" name="login" required autofocus>
+        </div>
+        <div class="field">
+            <label>Пароль</label>
+            <input type="password" name="password" required>
+        </div>
+        <label style="display:flex;align-items:center;gap:8px;font-weight:400">
+            <input type="checkbox" name="remember" style="width:auto"> Запомнить меня
+        </label>
+        <div class="form-actions">
+            <button type="submit">Войти</button>
+            <a class="btn btn-secondary" href="{{ url_for('index') }}">На главную</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

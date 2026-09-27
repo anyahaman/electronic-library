@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block title %}Книги — Электронная библиотека{% endblock %}
+{% block content %}
+<section class="hero">
+    <h1>Электронная библиотека</h1>
+    <p>Каталог книг с жанрами, оценками, рецензиями и персональными подборками.</p>
+</section>
+
+<div class="toolbar">
+    <div>
+        <h2 style="margin:0">Каталог книг</h2>
+    </div>
+    {% if current_user.is_authenticated and current_user.role.name == "Администратор" %}
+        <a class="btn btn-primary" href="{{ url_for('create_book') }}">＋ Добавить книгу</a>
+    {% endif %}
+</div>
+
+{% if books.items %}
+<div class="book-grid">
+    {% for book, avg_rating, review_count in books.items %}
+    <article class="book-card">
+        <div>
+            <h2>{{ book.title }}</h2>
+            <div class="meta">{{ book.author }} · {{ book.year }}</div>
+
+            <div class="badges">
+                {% for genre in book.genres %}
+                    <span class="badge">{{ genre.name }}</span>
+                {% endfor %}
+            </div>
+
+            <p><b>Издательство:</b> {{ book.publisher }}</p>
+            <p><b>Объём:</b> {{ book.pages }} стр.</p>
+            <p>
+                <span class="rating">★ {% if avg_rating is not none %}{{ "%.1f"|format(avg_rating) }}{% else %}—{% endif %}</span>
+                <span class="meta"> · рецензий: {{ review_count }}</span>
+            </p>
+        </div>
+
+        <div class="actions">
+            <a class="btn btn-primary" href="{{ url_for('book_page', id=book.id) }}">Просмотр</a>
+
+            {% if current_user.is_authenticated and current_user.role.name in ["Администратор", "Модератор"] %}
+                <a class="btn btn-secondary" href="{{ url_for('edit_book', id=book.id) }}">Редактировать</a>
+            {% endif %}
+
+            {% if current_user.is_authenticated and current_user.role.name == "Администратор" %}
+                <button
+                    class="btn btn-danger js-delete-book"
+                    type="button"
+                    data-book-id="{{ book.id }}"
+                    data-book-title="{{ book.title }}"
+                >Удалить</button>
+            {% endif %}
+        </div>
+    </article>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">Книг пока нет. Войдите как администратор и добавьте первую книгу.</div>
+{% endif %}
+
+<div class="pagination">
+    {% if books.has_prev %}<a href="{{ url_for('index', page=books.prev_num) }}">← Назад</a>{% endif %}
+    <span>Страница {{ books.page }} из {{ books.pages or 1 }}</span>
+    {% if books.has_next %}<a href="{{ url_for('index', page=books.next_num) }}">Вперёд →</a>{% endif %}
+</div>
+
+<div id="deleteModal" class="modal" style="display:none">
+    <div class="modal-box">
+        <h3>Удаление книги</h3>
+        <p>Вы уверены, что хотите удалить книгу <b id="deleteBookTitle"></b>?</p>
+        <form id="deleteBookForm" method="POST">
+            <div class="form-actions">
+                <button type="submit">Да, удалить</button>
+                <button class="btn btn-secondary" type="button" onclick="closeDeleteModal()">Нет</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const modal = document.getElementById('deleteModal');
+    const title = document.getElementById('deleteBookTitle');
+    const form = document.getElementById('deleteBookForm');
+
+    document.querySelectorAll('.js-delete-book').forEach(function (button) {
+        button.addEventListener('click', function () {
+            const bookId = button.dataset.bookId;
+            const bookTitle = button.dataset.bookTitle;
+
+            title.textContent = bookTitle;
+            form.action = '/book/delete/' + bookId;
+            modal.style.display = 'flex';
+        });
+    });
+
+    modal.addEventListener('click', function (event) {
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
+});
+
+function closeDeleteModal() {
+    document.getElementById('deleteModal').style.display = 'none';
+}
+</script>
+{% endblock %}

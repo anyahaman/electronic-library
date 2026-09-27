@@ -1,0 +1,81 @@
+{% macro book_form(book=None, genres=[], form_data=None, is_edit=False) %}
+<form id="book-form" method="POST" {% if not is_edit %}enctype="multipart/form-data"{% endif %}>
+    <div class="field">
+        <label>Название</label>
+        <input type="text" name="title" required
+               value="{{ form_data.get('title', book.title if book else '') if form_data else (book.title if book else '') }}">
+    </div>
+
+    <div class="field">
+        <label>Описание</label>
+        <textarea id="description" name="description" rows="8">{{ form_data.get('description', book.description if book else '') if form_data else (book.description if book else '') }}</textarea>
+        <span class="help">Описание поддерживает Markdown и проверяется санитайзером на сервере.</span>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px">
+        <div class="field">
+            <label>Год</label>
+            <input type="number" name="year" required
+                   value="{{ form_data.get('year', book.year if book else '') if form_data else (book.year if book else '') }}">
+        </div>
+        <div class="field">
+            <label>Количество страниц</label>
+            <input type="number" name="pages" min="1" required
+                   value="{{ form_data.get('pages', book.pages if book else '') if form_data else (book.pages if book else '') }}">
+        </div>
+    </div>
+
+    <div class="field">
+        <label>Издательство</label>
+        <input type="text" name="publisher" required
+               value="{{ form_data.get('publisher', book.publisher if book else '') if form_data else (book.publisher if book else '') }}">
+    </div>
+
+    <div class="field">
+        <label>Автор</label>
+        <input type="text" name="author" required
+               value="{{ form_data.get('author', book.author if book else '') if form_data else (book.author if book else '') }}">
+    </div>
+
+    <div class="field">
+        <label>Жанры</label>
+        {% set selected_ids = form_data.getlist('genres') if form_data else [] %}
+        <select name="genres" multiple size="6">
+            {% for genre in genres %}
+            <option value="{{ genre.id }}"
+                {% if (form_data and genre.id|string in selected_ids) or (not form_data and book and genre in book.genres) %}selected{% endif %}>
+                {{ genre.name }}
+            </option>
+            {% endfor %}
+        </select>
+        <span class="help">Выберите хотя бы один жанр. Для нескольких вариантов удерживайте Ctrl.</span>
+    </div>
+
+    {% if not is_edit %}
+    <div class="field">
+        <label>Обложка</label>
+        <input type="file" name="cover" accept="image/*" required>
+    </div>
+    {% endif %}
+
+    <div class="form-actions">
+        <button type="submit">Сохранить</button>
+        <a class="btn btn-secondary" href="{{ url_for('index') }}">Отмена</a>
+    </div>
+</form>
+
+<script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
+<script>
+    const descriptionElement = document.getElementById('description');
+    if (descriptionElement) {
+        const descriptionEditor = new EasyMDE({ element: descriptionElement, spellChecker: false });
+        const bookForm = document.getElementById('book-form');
+        if (bookForm) {
+            bookForm.addEventListener('submit', function () {
+                descriptionEditor.codemirror.save();
+            });
+        }
+    }
+</script>
+{% endmacro %}

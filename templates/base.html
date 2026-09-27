@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Электронная библиотека{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    {% block head %}{% endblock %}
+</head>
+<body>
+<header class="site-header">
+    <div class="container navbar">
+        <div class="nav-left">
+            <a class="brand" href="{{ url_for('index') }}">Электронная библиотека</a>
+            <a class="nav-link" href="{{ url_for('index') }}">Главная</a>
+            {% if current_user.is_authenticated and current_user.role.name == "Пользователь" %}
+                <a class="nav-link" href="{{ url_for('collections') }}">Мои подборки</a>
+            {% endif %}
+            {% if current_user.is_authenticated and current_user.role.name == "Администратор" %}
+                <a class="nav-link" href="{{ url_for('create_book') }}">Добавить книгу</a>
+            {% endif %}
+        </div>
+
+        <div class="nav-right">
+            {% if current_user.is_authenticated %}
+                <span class="user-pill">
+                    {{ current_user.surname }} {{ current_user.name }}
+                    {% if current_user.role %}· {{ current_user.role.name }}{% endif %}
+                </span>
+                <a class="nav-link" href="{{ url_for('logout') }}">Выйти</a>
+            {% else %}
+                <a class="btn btn-primary" href="{{ url_for('login') }}">Войти</a>
+            {% endif %}
+        </div>
+    </div>
+</header>
+
+<div class="container flash-wrap">
+    {% with messages = get_flashed_messages() %}
+        {% for message in messages %}
+            <div class="flash">{{ message }}</div>
+        {% endfor %}
+    {% endwith %}
+</div>
+
+<main class="container">
+    {% block content %}{% endblock %}
+</main>
+
+<footer class="site-footer">
+    <div class="container">
+        Хаманаева Анна, группа 241-372.
+    </div>
+</footer>
+</body>
+</html>

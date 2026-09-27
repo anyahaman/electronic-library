@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}{{ collection.name }} — подборка{% endblock %}
+{% block content %}
+<div class="toolbar">
+    <div>
+        <a href="{{ url_for('collections') }}">← Мои подборки</a>
+        <h1 style="margin:8px 0 0">{{ collection.name }}</h1>
+    </div>
+    <span class="badge">Книг: {{ collection.books|length }}</span>
+</div>
+
+{% if collection.books %}
+<div class="book-grid">
+{% for book in collection.books %}
+    <article class="book-card">
+        <h2>{{ book.title }}</h2>
+        <div class="meta">{{ book.author }} · {{ book.year }}</div>
+        <div class="badges">
+            {% for genre in book.genres %}<span class="badge">{{ genre.name }}</span>{% endfor %}
+        </div>
+        <div class="actions">
+            <a class="btn btn-primary" href="{{ url_for('book_page', id=book.id) }}">Открыть книгу</a>
+        </div>
+    </article>
+{% endfor %}
+</div>
+{% else %}
+<div class="empty-state">В этой подборке пока нет книг. Добавить книгу можно со страницы её просмотра.</div>
+{% endif %}
+{% endblock %}

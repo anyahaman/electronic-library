@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% from "macros/book_form.html" import book_form %}
+{% block title %}Добавление книги{% endblock %}
+{% block content %}
+<div class="form-card" style="max-width:900px;margin:0 auto">
+    <h1 style="margin-top:0">Добавление книги</h1>
+    <p class="meta">Заполните данные и загрузите обложку. Все поля обязательны, кроме тех, где явно указано обратное.</p>
+    {{ book_form(genres=genres, form_data=form_data, is_edit=False) }}
+</div>
+{% endblock %}
